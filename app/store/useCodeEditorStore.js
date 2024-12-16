@@ -1,14 +1,8 @@
 import { create } from "zustand";
-// import { LANGUAGE_CONFIG } from "../(root)/_constants";
-// import { Monaco } from "@monaco-editor/react";
-// import { Code } from "lucide-react";
-// import { Language } from "../types";
-// import { output } from "framer-motion/client";
-// import { exec } from "child_process";
 
 const getInitialState = () => {
   if (typeof window === "undefined") {
-    //if window is not defined mean runing on server side
+    // If window is not defined (running on server side)
     return {
       language: "javascript",
       fontSize: 16,
@@ -17,7 +11,7 @@ const getInitialState = () => {
   }
 
   const savedLanguage = localStorage.getItem("language") || "javascript";
-  const savedTheme = localStorage.getItem("theme") || "vs-dark";
+  const savedTheme = localStorage.getItem("editor-theme") || "vs-dark";
   const savedFontSize = localStorage.getItem("fontSize") || 16;
 
   return {
@@ -29,7 +23,7 @@ const getInitialState = () => {
 
 const initialState = getInitialState();
 
-export const useCodeEditorStore = create((get, set) => ({
+export const useCodeEditorStore = create((set, get) => ({
   ...initialState,
   output: "",
   isRunning: false,
@@ -45,8 +39,13 @@ export const useCodeEditorStore = create((get, set) => ({
     }
     set({ editor });
   },
+
   setTheme: (theme) => {
-    localStorage.setItem("theme", theme);
+    localStorage.setItem("editor-theme", theme);
     set({ theme });
+  },
+  setLanguage: (language) => {
+    localStorage.setItem("language", language);
+    set({ language });
   },
 }));

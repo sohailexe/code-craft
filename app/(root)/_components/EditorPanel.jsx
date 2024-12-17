@@ -9,12 +9,15 @@ import { motion } from "framer-motion";
 import Image from "next/image";
 import { RotateCcwIcon, ShareIcon, TypeIcon } from "lucide-react";
 import useMounted from "@/app/hooks/useMounted";
+import { useClerk } from "@clerk/nextjs";
+import { EditorPanelSkeleton } from "./EditorPanelSkeleton";
 
 const EditorPanel = () => {
   const [isSharedDialogOpen, setisSharedDialogOpen] = useState();
   const { language, theme, fontSize, editor, setFontSize, setEditor } =
     useCodeEditorStore();
   const mounted = useMounted();
+  const clerk = useClerk();
 
   useEffect(() => {
     const savedCode = localStorage.getItem(`editor-code-${language}`);
@@ -32,9 +35,17 @@ const EditorPanel = () => {
     }
   }, [fontSize]);
 
-  const handleRefresh = () => {};
+  const handleRefresh = () => {
+    let defaultCode = LANGUAGE_CONFIG[language].defaultCode;
+    if (editor) {
+      editor.setValue(defaultCode);
+    }
+    localStorage.removeItem(`editor-code-${language}`);
+  };
 
-  const handleEditorChange = () => {};
+  const handleEditorChange = (value) => {
+    localStorage.setItem(`editor-code-${language}`, value);
+  };
 
   const handleFontSizeChange = (size) => {
     setFontSize(size);
@@ -99,7 +110,7 @@ const EditorPanel = () => {
             <motion.button
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
-              onClick={() => setIsShareDialogOpen(true)}
+              onClick={() => setisSharedDialogOpen(true)}
               className="inline-flex items-center gap-2 px-4 py-2 rounded-lg overflow-hidden bg-gradient-to-r
                from-blue-500 to-blue-600 opacity-90 hover:opacity-100 transition-opacity"
             >
@@ -111,39 +122,39 @@ const EditorPanel = () => {
 
         {/* Editor  */}
         <div className="relative group rounded-xl overflow-hidden ring-1 ring-white/[0.05]">
-          {/* {clerk.loaded && ( */}
-          <Editor
-            height="600px"
-            language={LANGUAGE_CONFIG[language].monacoLanguage}
-            onChange={handleEditorChange}
-            theme={theme}
-            beforeMount={defineMonacoThemes}
-            onMount={(editor) => setEditor(editor)}
-            options={{
-              minimap: { enabled: false },
-              fontSize,
-              automaticLayout: true,
-              scrollBeyondLastLine: false,
-              padding: { top: 16, bottom: 16 },
-              renderWhitespace: "selection",
-              fontFamily: '"Fira Code", "Cascadia Code", Consolas, monospace',
-              fontLigatures: true,
-              cursorBlinking: "smooth",
-              smoothScrolling: true,
-              contextmenu: true,
-              renderLineHighlight: "all",
-              lineHeight: 1.6,
-              letterSpacing: 0.5,
-              roundedSelection: true,
-              scrollbar: {
-                verticalScrollbarSize: 8,
-                horizontalScrollbarSize: 8,
-              },
-            }}
-          />
-          {/* )} */}
+          {clerk.loaded && (
+            <Editor
+              height="600px"
+              language={LANGUAGE_CONFIG[language].monacoLanguage}
+              onChange={handleEditorChange}
+              theme={theme}
+              beforeMount={defineMonacoThemes}
+              onMount={(editor) => setEditor(editor)}
+              options={{
+                minimap: { enabled: false },
+                fontSize,
+                automaticLayout: true,
+                scrollBeyondLastLine: false,
+                padding: { top: 16, bottom: 16 },
+                renderWhitespace: "selection",
+                fontFamily: '"Fira Code", "Cascadia Code", Consolas, monospace',
+                fontLigatures: true,
+                cursorBlinking: "smooth",
+                smoothScrolling: true,
+                contextmenu: true,
+                renderLineHighlight: "all",
+                lineHeight: 1.6,
+                letterSpacing: 0.5,
+                roundedSelection: true,
+                scrollbar: {
+                  verticalScrollbarSize: 8,
+                  horizontalScrollbarSize: 8,
+                },
+              }}
+            />
+          )}
 
-          {/* {!clerk.loaded && <EditorPanelSkeleton />} */}
+          {!clerk.loaded && <EditorPanelSkeleton />}
         </div>
       </div>
     </div>

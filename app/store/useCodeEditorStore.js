@@ -1,7 +1,6 @@
 import { output } from "framer-motion/client";
 import { create } from "zustand";
 import { LANGUAGE_CONFIG } from "../(root)/_constants";
-import { error, log } from "node:console";
 
 const getInitialState = () => {
   if (typeof window === "undefined") {

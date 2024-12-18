@@ -51,8 +51,6 @@ export const useCodeEditorStore = create((set, get) => ({
     set({ language });
   },
   setFontSize: (fontSize) => {
-    console.log(fontSize);
-
     localStorage.setItem("editor-font-size", fontSize);
     set({ fontSize });
   },
@@ -83,8 +81,6 @@ export const useCodeEditorStore = create((set, get) => ({
       });
 
       const data = await response.json();
-      console.log(data);
-
       //handle api level errors
       if (data.message) {
         set({
@@ -98,7 +94,6 @@ export const useCodeEditorStore = create((set, get) => ({
 
       if (data.compile && data.compile.code != 0) {
         const error = data.compile.stderr || data.compile.output;
-
         set({
           error,
           executionResult: { code, output: "", error },

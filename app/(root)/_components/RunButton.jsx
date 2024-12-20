@@ -3,12 +3,28 @@ import React from "react";
 import { motion } from "framer-motion";
 import { useCodeEditorStore } from "@/app/store/useCodeEditorStore";
 import { Loader2, Play } from "lucide-react";
+import { useUser } from "@clerk/nextjs";
+import { useMutation } from "convex/react";
+import { api } from "@/convex/_generated/api";
+
 const RunButton = () => {
-  // const { user } = useUser();
-  const { runCode, language, isRunning, execution } = useCodeEditorStore();
+  const { user } = useUser();
+  const { runCode, language, isRunning, executionResult } =
+    useCodeEditorStore();
+
+  const saveExecution = useMutation(api.codeExecution.save);
 
   const handleRun = async () => {
     await runCode();
+    if (user && executionResult) {
+      // save executionresult into convexdb
+      await saveExecution({
+        language,
+        code: executionResult.code,
+        output: executionResult.output,
+        error: executionResult.error,
+      });
+    }
   };
   return (
     <motion.button
